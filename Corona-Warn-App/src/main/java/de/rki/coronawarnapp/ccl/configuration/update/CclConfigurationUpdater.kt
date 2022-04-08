@@ -38,7 +38,7 @@ class CclConfigurationUpdater @Inject constructor(
             updateAndTriggerRecalculation()
         } else {
             Timber.d("No CCLConfig update required!")
-            triggerRecalculation(configurationChanged = cclSettings.forceCclCalculation())
+            triggerRecalculation(configurationChanged = false)
         }
     }
 
@@ -60,6 +60,10 @@ class CclConfigurationUpdater @Inject constructor(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal suspend fun isUpdateRequired(now: Instant = timeStamper.nowUTC): Boolean {
+        if (cclSettings.forceCclCalculation()) {
+            Timber.d("Forcing update / calculation")
+            return true
+        }
         val lastExecution = cclSettings.getLastExecutionTime() ?: return true
 
         // update is needed if the last update was on a different day

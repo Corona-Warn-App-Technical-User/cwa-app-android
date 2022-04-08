@@ -129,7 +129,7 @@ class CclSettings @Inject constructor(
     }
 
     companion object {
-        internal val FORCE_CCL_CALCULATION_KEY = booleanPreferencesKey("ccl.settings.forceCclCalculation")
+        internal val FORCE_CCL_CALCULATION_KEY = booleanPreferencesKey("ccl.settings.forceCclCalculation-2.21.0.5")
         internal val LAST_EXECUTION_TIME_KEY = longPreferencesKey("ccl.settings.lastexecutiontime")
         internal val ADMISSION_SCENARIO_ID_KEY = stringPreferencesKey("ccl.settings.admissionScenarioId")
         internal val ADMISSION_CHECK_SCENARIOS_KEY = stringPreferencesKey("ccl.settings.admissionCheckScenarios")
