@@ -126,6 +126,62 @@ internal class RevocationListUpdaterTest : BaseTest() {
     }
 
     @Test
+    fun `update is not triggered when all certificates are deleted permanently`() =
+        runBlockingTest2(ignoreActive = true) {
+            val flow = MutableStateFlow(5)
+            every { certificatesProvider.allCertificatesSize } returns flow
+            getInstance(this)
+            flow.apply {
+                emit(5)
+                delay(1_000)
+                emit(5)
+                delay(1_000)
+                emit(5)
+                delay(1_000)
+                emit(0)
+            }
+
+            advanceTimeBy(3_000)
+
+            coVerify(exactly = 0) {
+                revocationUpdateSettings.getLastUpdateTime()
+                revocationRepository.updateRevocationList(any())
+                revocationUpdateSettings.setUpdateTimeToNow(any())
+            }
+        }
+
+    @Test
+    fun `update is triggered only once when many updates required then followed by many that don't`() =
+        runBlockingTest2(ignoreActive = true) {
+            coEvery { revocationUpdateSettings.getLastUpdateTime() } coAnswers {
+                delay(1_00)
+                Instant.EPOCH
+            }
+            val flow = MutableStateFlow(5)
+            every { certificatesProvider.allCertificatesSize } returns flow
+            getInstance(this)
+            flow.apply {
+                emit(5)
+                emit(5)
+                emit(5) // 1
+                emit(6) // 2
+                emit(7) // 3
+                emit(8) // 4
+                emit(9)
+                emit(9)
+                emit(8)
+                emit(7)
+            }
+
+            advanceTimeBy(6_00)
+
+            coVerify(exactly = 1) {
+                revocationRepository.updateRevocationList(any())
+                revocationUpdateSettings.setUpdateTimeToNow(any())
+            }
+        }
+
+    @Test
     fun `isUpdateRequires() should return true after one day`() = runBlockingTest {
         val updater = getInstance(this)
 

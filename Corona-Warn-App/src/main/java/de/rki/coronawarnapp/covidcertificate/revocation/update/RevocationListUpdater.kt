@@ -8,9 +8,14 @@ import de.rki.coronawarnapp.util.TimeAndDateExtensions.toLocalDateUtc
 import de.rki.coronawarnapp.util.TimeStamper
 import de.rki.coronawarnapp.util.coroutine.AppScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -33,8 +38,15 @@ class RevocationListUpdater @Inject constructor(
     init {
         appScope.launch {
             certificatesProvider.allCertificatesSize
+                .filterForceUpdate()
                 .drop(1) // App start emission
-                .collectLatest {
+                .filter {
+                    // The ones that actually matters (true), and if new changes are not requiring updates (false),
+                    // any previous update (true) that was running won't get cancelled
+                    it
+                }.catch {
+                    Timber.tag(TAG).d("filterForceUpdate flow failed -> %s", it.message)
+                }.collectLatest { // Cancel previous update is a new one came in
                     Timber.tag(TAG).d("Update revocation list on new registration")
                     updateRevocationList(true)
                 }
@@ -66,6 +78,29 @@ class RevocationListUpdater @Inject constructor(
 
         // update is needed if the last update was on a different day
         return lastExecution.toLocalDateUtc() != now.toLocalDateUtc()
+    }
+
+    /**
+     * Observes certificates count change and detect if force update is required.
+     * Idea is to trigger updates only when a new certificate is registered
+     * moving it to and from recycle bin and deleting it permanently don't count
+     * ex:
+     * From old=10 , new=10 -> false
+     * From old=10 , new=09 -> false
+     * From old=09 , new=08 -> false
+     * From old=08 , new=07 -> false
+     * From old=07 , new=08 -> true
+     * From old=08 , new=09 -> true
+     * From old=09 , new=00 -> false
+     * From old=00 , new=01 -> true
+     * From old=01 , new=02 -> true
+     */
+    private fun Flow<Int>.filterForceUpdate() = flow {
+        var old = Int.MIN_VALUE
+        collect { new ->
+            emit(new > old)
+            old = new
+        }
     }
 
     companion object {
