@@ -21,7 +21,7 @@ jobs:
       with:
         distribution: 'jdkfile'
         jdkFile: ${{ runner.temp }}/sapmachine-jdk-11.tar.gz
-        java-version: '11.0.14.1'
+        java-version: '11.0.14'
         architecture: x64    
 
     - name: Setup Android SDK
