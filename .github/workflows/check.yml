@@ -28,6 +28,23 @@ jobs:
       with:
         cache: true
         
+    - name: Corona-Warn-App:detekt
+      env:
+        JVM_OPTS: -Xmx4096m
+        GRADLE_OPTS: |
+              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
+              -Dorg.gradle.caching=true
+              -Dorg.gradle.configureondemand=true
+              -Dkotlin.compiler.execution.strategy=in-process
+              -Dkotlin.incremental=false
+      run: ./gradlew -PdisablePreDex :Corona-Warn-App:detekt
+
+    - name: Archive detekt report
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: detekt-${{ github.sha }}
+        path: Corona-Warn-App/build/reports          
+        
   detekt:      
     runs-on: ubuntu-latest
     needs: dependencies
