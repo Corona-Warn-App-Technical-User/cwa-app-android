@@ -37,4 +37,10 @@ jobs:
               -Dkotlin.compiler.execution.strategy=in-process
               -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:detekt
+
+    - name: Archive detekt report
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: detekt-${{ github.sha }}
+        path: Corona-Warn-App/build/reports  
       
