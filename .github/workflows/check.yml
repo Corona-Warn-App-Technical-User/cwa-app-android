@@ -5,7 +5,7 @@ on:
     branches:
     - feature/13058-GitHub-Actions    
 jobs:
-  build:
+  dependencies:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,10 +24,16 @@ jobs:
         java-version: '11.0.14'
         architecture: x64    
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-      
-    - name: Detekt
+    - uses: maxim-lobanov/setup-android-tools@v1
+      with:
+        cache: true
+        
+  detekt:      
+    runs-on: ubuntu-latest
+    needs: dependencies
+   
+    steps:
+    - name: Corona-Warn-App:detekt
       env:
         JVM_OPTS: -Xmx4096m
         GRADLE_OPTS: |
