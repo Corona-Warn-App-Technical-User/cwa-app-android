@@ -1,7 +1,9 @@
 name: Check
 
 on:
-
+  push:
+    branches:
+    - feature/13058-GitHub-Actions    
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,3 +18,4 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
+
