@@ -322,7 +322,7 @@ jobs:
       id: split-tests
       name: Split tests
       with:
-        glob: "**/test*/**/*.kt"
+        glob: Corona-Warn-App/**/test*/**/*.kt
         split-total: ${{ env.total-runners }}
         split-index: ${{ matrix.runner-index }}    
     
