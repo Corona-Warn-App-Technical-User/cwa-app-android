@@ -323,7 +323,7 @@ jobs:
       name: Split tests
       with:
         glob: Corona-Warn-App/**/test*/**/*.kt
-        split-total: ${{ env.total-runners }}
+        split-total: ${{ env.total-test-runners }}
         split-index: ${{ matrix.runner-index }}    
     
     - name: Quick Build
