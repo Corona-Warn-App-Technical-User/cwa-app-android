@@ -325,6 +325,8 @@ jobs:
         glob: Corona-Warn-App/**/test*/**/*.kt
         split-total: ${{ env.total-test-runners }}
         split-index: ${{ matrix.runner-index }}    
+
+    - run: 'echo "This runner will execute the following tests: ${{ steps.split-tests.outputs.test-suite }}"'
     
     - name: Quick Build
       env:
