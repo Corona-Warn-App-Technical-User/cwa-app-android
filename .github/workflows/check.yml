@@ -323,7 +323,6 @@ jobs:
       name: Split tests
       with:
         glob: Corona-Warn-App/**/test*/**/*.kt
-        exclude-glob: Corona-Warn-App/**/testhelpers/**/*.kt
         split-total: ${{ env.total-test-runners }}
         split-index: ${{ matrix.runner-index }}    
 
@@ -338,7 +337,7 @@ jobs:
               -Dorg.gradle.configureondemand=true
               -Dkotlin.compiler.execution.strategy=in-process
               -Dkotlin.incremental=false
-      run: ./gradlew -PdisablePreDex :Corona-Warn-App:testDeviceReleaseUnitTest -i -PtestFilter=${{ steps.split-tests.outputs.test-suite }}
+      run: ./gradlew -PdisablePreDex :Corona-Warn-App:testDeviceReleaseUnitTest -i -PtestFilter="${{ steps.split-tests.outputs.test-suite }}"
       
     - name: Archive Test Result
       uses: actions/upload-artifact@v3.0.0
