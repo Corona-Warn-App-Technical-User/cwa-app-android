@@ -289,10 +289,14 @@ jobs:
           echo "::set-output name=json::${INDEX_JSON}"
           
   unit_tests_device_release:
+    name: "Runner #${{ matrix.runner-index }}: Run test suite in parallel"
     runs-on: ubuntu-latest
     needs:
       - dependencies
       - unit-test-runner-indexes
+    strategy:
+      matrix:
+        runner-index: ${{ fromJSON(needs.unit-test-runner-indexes.outputs.json) }}
     steps:
     - uses: actions/checkout@v3
 
@@ -313,6 +317,14 @@ jobs:
     - uses: maxim-lobanov/setup-android-tools@v1
       with:
         cache: true
+
+    - uses: chaosaffe/split-tests@v1-alpha.1
+      id: split-tests
+      name: Split tests
+      with:
+        glob: /**/test*/**/*.kt
+        split-total: ${{ env.total-runners }}
+        split-index: ${{ matrix.runner-index }}    
     
     - name: Quick Build
       env:
@@ -323,7 +335,7 @@ jobs:
               -Dorg.gradle.configureondemand=true
               -Dkotlin.compiler.execution.strategy=in-process
               -Dkotlin.incremental=false
-      run: ./gradlew -PdisablePreDex :Corona-Warn-App:testDeviceReleaseUnitTest -i
+      run: ./gradlew -PdisablePreDex :Corona-Warn-App:testDeviceReleaseUnitTest -i -PtestFilter={{ steps.split-tests.outputs.test-suite }}
       
     - name: Archive Test Result
       uses: actions/upload-artifact@v3.0.0
