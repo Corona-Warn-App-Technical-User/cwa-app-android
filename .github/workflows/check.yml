@@ -6,8 +6,8 @@ on:
     - feature/13058-GitHub-Actions    
     
 env:
-  total-test-runners: 3
-  
+  total-test-runners: 4
+
 jobs:
   dependencies:
     runs-on: ubuntu-latest
