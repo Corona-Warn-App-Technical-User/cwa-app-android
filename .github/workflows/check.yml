@@ -111,7 +111,7 @@ jobs:
     - name: Archive detekt report
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: detekt-${{ github.sha }}
+        name: klint-${{ github.sha }}
         path: Corona-Warn-App/build/reports          
       
   lint_device_release_check:      
@@ -153,7 +153,7 @@ jobs:
     - name: Archive detekt report
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: detekt-${{ github.sha }}
+        name: lintDeviceRelease-${{ github.sha }}
         path: Corona-Warn-App/build/reports  
 
   lint_device_for_testers_release_check:      
@@ -195,7 +195,7 @@ jobs:
     - name: Archive detekt report
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: detekt-${{ github.sha }}
+        name: lintDeviceForTesters-${{ github.sha }}
         path: Corona-Warn-App/build/reports  
 
   quick_build_device_release_no_tests:
@@ -233,12 +233,6 @@ jobs:
               -Dkotlin.compiler.execution.strategy=in-process
               -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex assembleDeviceRelease
-    
-    - name: Archive Reports
-      uses: actions/upload-artifact@v3.0.0
-      with:
-        name: Reports-${{ github.sha }}
-        path: Corona-Warn-App/build/reports  
         
   quick_build_device_for_testers_release_no_tests:
     runs-on: ubuntu-latest
@@ -276,9 +270,44 @@ jobs:
               -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersRelease
     
-    - name: Archive Reports
+  unit_tests_device_release:
+    runs-on: ubuntu-latest
+    needs: dependencies
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download sapmachine JDK 11
+      run: |
+        download_url="https://github.com/SAP/SapMachine/releases/download/sapmachine-11.0.14.1/sapmachine-jdk-11.0.14.1_linux-x64_bin.tar.gz"
+        wget -O "${RUNNER_TEMP}/sapmachine-jdk-11.tar.gz" "${download_url}"
+        
+    - name: Setup sapmachine JDK 11
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'jdkfile'
+        jdkFile: ${{ runner.temp }}/sapmachine-jdk-11.tar.gz
+        java-version: '11.0.14'
+        architecture: x64    
+        cache: 'gradle'
+
+    - uses: maxim-lobanov/setup-android-tools@v1
+      with:
+        cache: true
+    
+    - name: Quick Build
+      env:
+        JVM_OPTS: -Xmx4096m
+        GRADLE_OPTS: |
+              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
+              -Dorg.gradle.caching=true
+              -Dorg.gradle.configureondemand=true
+              -Dkotlin.compiler.execution.strategy=in-process
+              -Dkotlin.incremental=false
+      run: ./gradlew -PdisablePreDex :Corona-Warn-App:testDeviceReleaseUnitTest -i
+      
+    - name: Archive Test Result
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: Reports-${{ github.sha }}
-        path: Corona-Warn-App/build/reports  
-  
+        name: UnitTestResults-DeviceRelease-${{ github.sha }}
+        path: Corona-Warn-App/build/test-results
