@@ -4,6 +4,10 @@ on:
   push:
     branches:
     - feature/13058-GitHub-Actions    
+    
+env:
+  total-test-runners: 3
+  
 jobs:
   dependencies:
     runs-on: ubuntu-latest
@@ -270,10 +274,25 @@ jobs:
               -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersRelease
     
+    
+  unit-test-runner-indexes:
+    runs-on: ubuntu-latest
+    name: Generate unit test runner indexes
+    outputs:
+      json: ${{ steps.generate-index-list.outputs.json }}
+    steps:
+      - id: generate-index-list
+        run: |
+          MAX_INDEX=$((${{ env.total-test-runners }}-1))
+          INDEX_LIST=$(seq 0 ${MAX_INDEX})
+          INDEX_JSON=$(jq --null-input --compact-output '. |= [inputs]' <<< ${INDEX_LIST})
+          echo "::set-output name=json::${INDEX_JSON}"
+          
   unit_tests_device_release:
     runs-on: ubuntu-latest
-    needs: dependencies
-
+    needs:
+      - dependencies
+      - unit-test-runner-indexes
     steps:
     - uses: actions/checkout@v3
 
