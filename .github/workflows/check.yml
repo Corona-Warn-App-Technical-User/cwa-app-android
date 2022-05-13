@@ -323,6 +323,7 @@ jobs:
       name: Split tests
       with:
         glob: Corona-Warn-App/**/test*/**/*.kt
+        exclude-glob: Corona-Warn-App/**/testhelpers/**/*.kt
         split-total: ${{ env.total-test-runners }}
         split-index: ${{ matrix.runner-index }}    
 
