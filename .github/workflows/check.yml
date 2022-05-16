@@ -72,7 +72,7 @@ jobs:
     - name: Archive detekt report
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: detekt-${{ github.sha }}
+        name: reports
         path: Corona-Warn-App/build/reports  
         
         
@@ -115,7 +115,7 @@ jobs:
     - name: Archive detekt report
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: klint-${{ github.sha }}
+        name: reports
         path: Corona-Warn-App/build/reports          
       
   lint_device_release_check:      
@@ -157,7 +157,7 @@ jobs:
     - name: Archive detekt report
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: lintDeviceRelease-${{ github.sha }}
+        name: reports
         path: Corona-Warn-App/build/reports  
 
   lint_device_for_testers_release_check:      
@@ -199,7 +199,7 @@ jobs:
     - name: Archive detekt report
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: lintDeviceForTesters-${{ github.sha }}
+        name: reports
         path: Corona-Warn-App/build/reports  
 
   quick_build_device_release_no_tests:
@@ -342,13 +342,13 @@ jobs:
     - name: Archive Test Result
       uses: actions/upload-artifact@v3
       with:
-        name: UnitTestResults-DeviceRelease-XML-${{ matrix.runner-index }}-${{ github.sha }}
+        name: testResults
         path: Corona-Warn-App/build/test-results
         
     - name: Archive Test Result
       uses: actions/upload-artifact@v3
       with:
-        name: UnitTestResults-DeviceRelease-Reports-${{ matrix.runner-index }}-${{ github.sha }}
+        name: reports
         path: Corona-Warn-App/build/reports
 
   publish_test_results_device_release:
@@ -360,6 +360,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
         with:
+          name: testResults
           path: artifacts
 
       - name: Display structure of downloaded files
