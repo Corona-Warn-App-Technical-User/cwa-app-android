@@ -340,13 +340,24 @@ jobs:
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:testDeviceReleaseUnitTest -i -PtestFilter="${{ steps.split-tests.outputs.test-suite }}"
       
     - name: Archive Test Result
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3
       with:
         name: UnitTestResults-DeviceRelease-${{ matrix.runner-index }}-${{ github.sha }}
         path: Corona-Warn-App/build/test-results
-        
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1
-      if: always()
-      with:
-        files: "Corona-Warn-App/build/test-results/**/*.xml"        
+
+  publish_test_results_device_release:
+    runs-on: ubuntu-latest
+    needs: unit_tests_device_release
+    permissions:
+      checks: write
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v3
+        if: always()
+        with:
+          files: "artifacts/**/*.xml"        
