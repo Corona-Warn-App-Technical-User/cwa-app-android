@@ -450,6 +450,9 @@ jobs:
         run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersDebugAndroidTest    
   
       - name: Setup Google Cloud access
+        env:
+            GCLOUD_SERVICE_KEY_BASE64: '${{ secrets.GCLOUD_SERVICE_KEY_BASE64 }}'
+            GOOGLE_PROJECT_ID: '${{ secrets.GOOGLE_PROJECT_ID }}'            
         run: |
           echo $GCLOUD_SERVICE_KEY_BASE64 | base64 -di > ${HOME}/gcloud-service-key.json
           sudo gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
