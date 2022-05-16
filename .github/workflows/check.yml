@@ -342,8 +342,14 @@ jobs:
     - name: Archive Test Result
       uses: actions/upload-artifact@v3
       with:
-        name: UnitTestResults-DeviceRelease-${{ matrix.runner-index }}-${{ github.sha }}
+        name: UnitTestResults-DeviceRelease-XML-${{ matrix.runner-index }}-${{ github.sha }}
         path: Corona-Warn-App/build/test-results
+        
+    - name: Archive Test Result
+      uses: actions/upload-artifact@v3
+      with:
+        name: UnitTestResults-DeviceRelease-Reports-${{ matrix.runner-index }}-${{ github.sha }}
+        path: Corona-Warn-App/build/reports
 
   publish_test_results_device_release:
     runs-on: ubuntu-latest
@@ -356,8 +362,13 @@ jobs:
         with:
           path: artifacts
 
+      - name: Display structure of downloaded files
+        run: ls -R
+  
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v3
         if: always()
         with:
-          files: "artifacts/**/*.xml"        
+          files: "artifacts/**/*.xml"     
+          
+          
