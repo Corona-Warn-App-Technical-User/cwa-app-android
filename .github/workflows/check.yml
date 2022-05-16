@@ -7,6 +7,13 @@ on:
     
 env:
   total-test-runners: 4
+  JVM_OPTS: -Xmx4096m
+  GRADLE_OPTS: |
+        -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
+        -Dorg.gradle.caching=true
+        -Dorg.gradle.configureondemand=true
+        -Dkotlin.compiler.execution.strategy=in-process
+        -Dkotlin.incremental=false  
 
 jobs:
   dependencies:
@@ -59,14 +66,6 @@ jobs:
         cache: true
         
     - name: Corona-Warn-App:detekt
-      env:
-        JVM_OPTS: -Xmx4096m
-        GRADLE_OPTS: |
-              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-              -Dorg.gradle.caching=true
-              -Dorg.gradle.configureondemand=true
-              -Dkotlin.compiler.execution.strategy=in-process
-              -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:detekt
 
     - name: Archive detekt report
@@ -102,14 +101,6 @@ jobs:
         cache: true
         
     - name: Corona-Warn-App:ktlintCheck
-      env:
-        JVM_OPTS: -Xmx4096m
-        GRADLE_OPTS: |
-              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-              -Dorg.gradle.caching=true
-              -Dorg.gradle.configureondemand=true
-              -Dkotlin.compiler.execution.strategy=in-process
-              -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:ktlintCheck
 
     - name: Archive detekt report
@@ -144,14 +135,6 @@ jobs:
         cache: true
         
     - name: Corona-Warn-App:lintDeviceRelease
-      env:
-        JVM_OPTS: -Xmx4096m
-        GRADLE_OPTS: |
-              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-              -Dorg.gradle.caching=true
-              -Dorg.gradle.configureondemand=true
-              -Dkotlin.compiler.execution.strategy=in-process
-              -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:lintDeviceRelease -i
 
     - name: Archive detekt report
@@ -186,14 +169,6 @@ jobs:
         cache: true
         
     - name: Corona-Warn-App:lintDeviceForTestersRelease
-      env:
-        JVM_OPTS: -Xmx4096m
-        GRADLE_OPTS: |
-              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-              -Dorg.gradle.caching=true
-              -Dorg.gradle.configureondemand=true
-              -Dkotlin.compiler.execution.strategy=in-process
-              -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:lintDeviceForTestersRelease -i
 
     - name: Archive detekt report
@@ -228,14 +203,6 @@ jobs:
         cache: true
     
     - name: Quick Build
-      env:
-        JVM_OPTS: -Xmx4096m
-        GRADLE_OPTS: |
-              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-              -Dorg.gradle.caching=true
-              -Dorg.gradle.configureondemand=true
-              -Dkotlin.compiler.execution.strategy=in-process
-              -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex assembleDeviceRelease
         
   quick_build_device_for_testers_release_no_tests:
@@ -264,14 +231,6 @@ jobs:
         cache: true
     
     - name: Quick Build
-      env:
-        JVM_OPTS: -Xmx4096m
-        GRADLE_OPTS: |
-              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-              -Dorg.gradle.caching=true
-              -Dorg.gradle.configureondemand=true
-              -Dkotlin.compiler.execution.strategy=in-process
-              -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersRelease
     
     
@@ -329,14 +288,6 @@ jobs:
     - run: 'echo "This runner will execute the following tests: ${{ steps.split-tests.outputs.test-suite }}"'
     
     - name: Test
-      env:
-        JVM_OPTS: -Xmx4096m
-        GRADLE_OPTS: |
-              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-              -Dorg.gradle.caching=true
-              -Dorg.gradle.configureondemand=true
-              -Dkotlin.compiler.execution.strategy=in-process
-              -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:testDeviceReleaseUnitTest -i -PtestFilter="${{ steps.split-tests.outputs.test-suite }}"
       
     - name: Archive Test Result
@@ -392,14 +343,6 @@ jobs:
     - run: 'echo "This runner will execute the following tests: ${{ steps.split-tests.outputs.test-suite }}"'
     
     - name: Test
-      env:
-        JVM_OPTS: -Xmx4096m
-        GRADLE_OPTS: |
-              -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-              -Dorg.gradle.caching=true
-              -Dorg.gradle.configureondemand=true
-              -Dkotlin.compiler.execution.strategy=in-process
-              -Dkotlin.incremental=false
       run: ./gradlew -PdisablePreDex :Corona-Warn-App:testDeviceForTestersReleaseUnitTest -i -PtestFilter="${{ steps.split-tests.outputs.test-suite }}"
       
     - name: Archive Test Result
@@ -501,25 +444,9 @@ jobs:
           cache: true   
        
       - name: Build App APK
-        env:
-          JVM_OPTS: -Xmx4096m
-          GRADLE_OPTS: |
-                -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-                -Dorg.gradle.caching=true
-                -Dorg.gradle.configureondemand=true
-                -Dkotlin.compiler.execution.strategy=in-process
-                -Dkotlin.incremental=false
         run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersDebug
   
       - name: Build Test App APK
-        env:
-          JVM_OPTS: -Xmx4096m
-          GRADLE_OPTS: |
-                -Xmx1536m -XX:+HeapDumpOnOutOfMemoryError
-                -Dorg.gradle.caching=true
-                -Dorg.gradle.configureondemand=true
-                -Dkotlin.compiler.execution.strategy=in-process
-                -Dkotlin.incremental=false
         run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersDebugAndroidTest    
   
       - name: Setup Google Cloud access
