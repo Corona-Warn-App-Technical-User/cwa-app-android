@@ -435,5 +435,5 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: always()
         with:
-          files: "artifacts/UnitTestResults-*-XML*/testDeviceReleaseUnitTest/*.xml"     
+          files: "artifacts/test*UnitTest/*.xml"     
           
