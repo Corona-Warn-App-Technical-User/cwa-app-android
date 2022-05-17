@@ -494,12 +494,12 @@ jobs:
       - name: Archive Test Result
         uses: actions/upload-artifact@v3
         with:
-          name: reports
-          path: firebase-results/blueline-28-de_DE-portrait
+          name: testResults
+          path: firebase-results
 
       - name: Publish Firebase Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: always()
         with:
           check_name: "Firebase Test Results"
-          files: "firebase-results/blueline-28-de_DE-portrait/*.xml" 
+          files: "firebase-results/**/*.xml" 
