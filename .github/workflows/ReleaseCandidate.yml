@@ -17,7 +17,7 @@ env:
 jobs:
   dependencies:
     runs-on: ubuntu-latest
-
+     
     steps:
     - uses: actions/checkout@v3
     
@@ -42,7 +42,13 @@ jobs:
   quick_build_device_for_testers_signed:
     runs-on: ubuntu-latest
     needs: dependencies
-     
+    env:
+      keystore_download_token: '${{ secrets.KEYSTORE_DOWNLOAD_TOKEN }}'
+      keystore_download_url: '${{ secrets.KEYSTORE_DOWNLOAD_URL }}'
+      keystore_download_filename: '${{ secrets.KEYSTORE_DOWNLOAD_FILENAME }}'
+      environments_download_url: '${{ secrets.ENVIRONMENTS_DOWNLOAD_URL }}'
+      env_prop_download_filename: '${{ secrets.ENV_PROP_DOWNLOAD_FILENAME }}'
+      
     steps:
       - uses: actions/checkout@v3
 
