@@ -463,5 +463,6 @@ jobs:
           echo "export BUCKETDIR=\"`date "+%Y-%m-%d-%H:%M:%S:%3N"`-${RANDOM}\"" >> $GITHUB_ENV
           
       - name: Output BUCKETDIR
+        run: |
           echo "${{ env.BUCKETDIR }} is setup"
 
