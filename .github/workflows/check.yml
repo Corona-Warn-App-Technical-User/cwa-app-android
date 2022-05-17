@@ -423,7 +423,9 @@ jobs:
     env:
       GCLOUD_SERVICE_KEY_BASE64: '${{ secrets.GCLOUD_SERVICE_KEY_BASE64 }}'
       GOOGLE_PROJECT_ID: '${{ secrets.GOOGLE_PROJECT_ID }}'    
-
+    permissions:
+      checks: write
+      pull-requests: write
     steps:
   
       - uses: actions/checkout@v3
