@@ -72,10 +72,10 @@ jobs:
 
       - name: Download Keystore
         run: |
-          curl --header "Authorization: token $keystore_download_token" --header "Accept: application/vnd.github.v3.raw" --remote-name --location "$keystore_download_url$keystore_download_filename"
+          curl --header "Authorization: token ${keystore_download_token}" --header "Accept: application/vnd.github.v3.raw" --remote-name --location "${keystore_download_url}${keystore_download_filename}"
       - name: Download Environment Properties
         run: |
-          curl --header "Authorization: token $keystore_download_token" --header "Accept: application/vnd.github.v3.raw" --remote-name --location "$environments_download_url$env_prop_download_filename"
+          curl --header "Authorization: token ${keystore_download_token}" --header "Accept: application/vnd.github.v3.raw" --remote-name --location "${environments_download_url}${env_prop_download_filename}"
 
         
   firebase_screenshots:
