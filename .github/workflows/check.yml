@@ -14,7 +14,7 @@ env:
         -Dorg.gradle.configureondemand=true
         -Dkotlin.compiler.execution.strategy=in-process
         -Dkotlin.incremental=false  
-
+        
 jobs:
   dependencies:
     runs-on: ubuntu-latest
@@ -420,7 +420,10 @@ jobs:
     needs: 
       - detekt
       - klint
-      
+    env:
+      GCLOUD_SERVICE_KEY_BASE64: '${{ secrets.GCLOUD_SERVICE_KEY_BASE64 }}'
+      GOOGLE_PROJECT_ID: '${{ secrets.GOOGLE_PROJECT_ID }}'    
+
     steps:
   
       - uses: actions/checkout@v3
@@ -449,10 +452,7 @@ jobs:
       - name: Build Test App APK
         run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersDebugAndroidTest    
   
-      - name: Setup Google Cloud access
-        env:
-            GCLOUD_SERVICE_KEY_BASE64: '${{ secrets.GCLOUD_SERVICE_KEY_BASE64 }}'
-            GOOGLE_PROJECT_ID: '${{ secrets.GOOGLE_PROJECT_ID }}'            
+      - name: Setup Google Cloud access        
         run: |
           echo $GCLOUD_SERVICE_KEY_BASE64 | base64 -di > ${HOME}/gcloud-service-key.json
           sudo gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
@@ -461,8 +461,45 @@ jobs:
       - name: Setup Testlab environment
         run: |
           echo "BUCKETDIR=`date "+%Y-%m-%d-%H:%M:%S:%3N"`-${RANDOM}" >> $GITHUB_ENV
-          
-      - name: Output BUCKETDIR
-        run: |
-          echo "${{ env.BUCKETDIR }} is setup"
 
+      - name: Test with Firebase Test Lab
+        run: |
+          echo "Using bucketdir ${{ env.BUCKETDIR }}"
+          sudo gcloud firebase test android run \
+            --type instrumentation \
+            --app Corona-Warn-App/build/outputs/apk/deviceForTesters/debug/*.apk \
+            --test Corona-Warn-App/build/outputs/apk/androidTest/deviceForTesters/debug/*.apk \
+            --results-dir ${{ env.BUCKETDIR }} \
+            --results-bucket ${GOOGLE_PROJECT_ID}-circleci-android \
+            --environment-variables clearPackageData=true \
+            --test-targets "notAnnotation testhelpers.Screenshot" \
+            --timeout 20m \
+            --device-ids blueline \
+            --os-version-ids 28 \
+            --locales de_DE \
+            --orientations portrait \
+            --num-flaky-test-attempts 3 \
+            --no-record-video
+            
+      - name: Create directory to store test results
+        if: always()
+        run: mkdir firebase-results          
+  
+      - name: Install gsutil dependency and copy test results data
+        if: always()
+        run: |
+          sudo pip install -U crcmod
+          sudo gsutil -m cp -R -U gs://${GOOGLE_PROJECT_ID}-circleci-android/${{ env.BUCKETDIR }}/blueline* firebase-results        
+
+      - name: Archive Test Result
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: firebase-results/blueline-28-de_DE-portrait
+
+      - name: Publish Firebase Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          check_name: "Firebase Test Results"
+          files: "firebase-results/blueline-28-de_DE-portrait/*.xml" 
