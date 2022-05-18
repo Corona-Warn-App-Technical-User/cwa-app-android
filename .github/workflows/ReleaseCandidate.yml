@@ -105,6 +105,17 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: Corona-Warn-App/build/outputs/apk/deviceForTesters/release/*.apk
+          
+      - name: Send to T-System
+        env: 
+          tsystems_upload_url: '${{ secrets.TSYSTEM_UPLOAD_URL }}'
+          tsystems_upload_bearer: '${{ secrets.TSYSTEM_UPLOAD_BEARER }}'
+        run: |
+          fileName=$(find Corona-Warn-App/build/outputs/apk/deviceForTesters/release -name '*Corona-Warn-App*.apk')
+          curl --location --request POST $tsystems_upload_url \
+          --header "Authorization: Bearer $tsystems_upload_bearer" \
+          --form "file=@${fileName}" \
+          --form "camera=true"
 
   firebase_screenshots:
     runs-on: ubuntu-latest
