@@ -104,8 +104,7 @@ jobs:
       - name: Archive apk
         uses: actions/upload-artifact@v3
         with:
-          name: apk
-          path: Corona-Warn-App/build/outputs/apk
+          path: Corona-Warn-App/build/outputs/apk/deviceForTesters/release/*.apk
 
   firebase_screenshots:
     runs-on: ubuntu-latest
@@ -176,7 +175,14 @@ jobs:
         run: |
           sudo pip install -U crcmod
           sudo gsutil -m cp -R -U gs://${GOOGLE_PROJECT_ID}-circleci-android/${{ env.BUCKETDIR }}/blueline* mkdir firebase-screenshots
-          
+
+      - name: Clean up pulled bucket
+        run: |
+          rm -rf firebase-screenshots/*/test_cases
+          rm -f firebase-screenshots/*/instrumentation.results
+          rm -f firebase-screenshots/*/logcat
+          rm -f firebase-screenshots/*/test_result_1.xml
+
       - name: Archive Test Result
         uses: actions/upload-artifact@v3
         with:
