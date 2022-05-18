@@ -178,10 +178,10 @@ jobs:
 
       - name: Clean up pulled bucket
         run: |
-          rm -rf firebase-screenshots/*/test_cases
-          rm -f firebase-screenshots/*/instrumentation.results
-          rm -f firebase-screenshots/*/logcat
-          rm -f firebase-screenshots/*/test_result_1.xml
+          sudo rm -rf firebase-screenshots/*/test_cases
+          sudo rm -f firebase-screenshots/*/instrumentation.results
+          sudo rm -f firebase-screenshots/*/logcat
+          sudo rm -f firebase-screenshots/*/test_result_1.xml
 
       - name: Archive Test Result
         uses: actions/upload-artifact@v3
