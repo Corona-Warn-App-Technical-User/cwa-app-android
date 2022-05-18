@@ -48,6 +48,8 @@ jobs:
       keystore_download_filename: '${{ secrets.KEYSTORE_DOWNLOAD_FILENAME }}'
       environments_download_url: '${{ secrets.ENVIRONMENTS_DOWNLOAD_URL }}'
       env_prop_download_filename: '${{ secrets.ENV_PROP_DOWNLOAD_FILENAME }}'
+      keystore_filename: '${{ secrets.KEYSTORE_FILENAME }}'
+      keystore_encrypt_key: '${{ secrets.KEYSTORE_ENCRYPT_KEY }}'
       
     steps:
       - uses: actions/checkout@v3
@@ -76,7 +78,15 @@ jobs:
       - name: Download Environment Properties
         run: |
           curl --header "Authorization: token ${keystore_download_token}" --header "Accept: application/vnd.github.v3.raw" --remote-name --location "${environments_download_url}${env_prop_download_filename}"
-
+      - name: Decrypt Keystore
+        run: openssl enc -aes-256-cbc -d -pbkdf2 -iter 100000 -in $keystore_download_filename -out $keystore_filename -k $keystore_encrypt_key
+        
+      - name: Prepare commit hash
+        run: |
+          commit_hash=$(echo $CIRCLE_SHA1 | cut -c1-5)
+          echo $commit_hash
+          echo "" >> "./gradle.properties"
+          echo "commit_hash=$commit_hash" >> "./gradle.properties"        
         
   firebase_screenshots:
     runs-on: ubuntu-latest
