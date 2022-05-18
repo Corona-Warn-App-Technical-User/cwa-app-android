@@ -83,10 +83,27 @@ jobs:
         
       - name: Prepare commit hash
         run: |
-          commit_hash=$(echo $CIRCLE_SHA1 | cut -c1-5)
-          echo $commit_hash
+          echo $(echo $CIRCLE_SHA1 | cut -c1-5)
           echo "" >> "./gradle.properties"
-          echo "commit_hash=$commit_hash" >> "./gradle.properties"        
+          echo "commit_hash=$(echo $CIRCLE_SHA1 | cut -c1-5)" >> "./gradle.properties"      
+          
+      - name: Prepare keystore properties for Signing
+        run: |
+          echo "" >> "./keystore.properties"
+          echo "deviceForTestersRelease.storePath=../${keystore_filename}" >> "./keystore.properties"
+          echo "deviceForTestersRelease.storePassword=${keystore_password}" >> "./keystore.properties"
+          echo "deviceForTestersRelease.keyAlias=${key_alias}" >> "./keystore.properties"
+          echo "deviceForTestersRelease.keyPassword=${key_password}" >> "./keystore.properties"          
+          
+      - name: Quick Build
+        run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersRelease
+
+      - name: Archive apk
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk
+          path: Corona-Warn-App/build/outputs/apk
+      
         
   firebase_screenshots:
     runs-on: ubuntu-latest
