@@ -117,6 +117,13 @@ jobs:
           --form "file=@${fileName}" \
           --form "camera=true"
 
+      - name: trigger App Automation Testing
+        run: |
+          curl -u $CIRCLE_API_ADMIN_TOKEN: \
+          -d '{"branch":"main","parameters":{"mobile-os":"android"}}' \
+          -H 'content-type: application/json' \
+          https://circleci.com/api/v2/project/github/corona-warn-app/cwa-app-automation/pipeline
+
   firebase_screenshots:
     runs-on: ubuntu-latest
     needs: dependencies
@@ -187,6 +194,13 @@ jobs:
           sudo pip install -U crcmod
           sudo gsutil -m cp -R -U gs://${GOOGLE_PROJECT_ID}-circleci-android/${{ env.BUCKETDIR }}/blueline* mkdir firebase-screenshots
 
+      - name: Publish Firebase Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          check_name: "Firebase Test Results"
+          files: "firebase-screenshots/**/*.xml" 
+          
       - name: Clean up pulled bucket
         run: |
           sudo rm -rf firebase-screenshots/*/test_cases
@@ -200,10 +214,5 @@ jobs:
           name: screenshots
           path: firebase-screenshots
 
-      - name: Publish Firebase Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
-        if: always()
-        with:
-          check_name: "Firebase Test Results"
-          files: "firebase-screenshots/**/*.xml" 
+
 
