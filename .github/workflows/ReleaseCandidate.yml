@@ -50,6 +50,7 @@ jobs:
       env_prop_download_filename: '${{ secrets.ENV_PROP_DOWNLOAD_FILENAME }}'
       keystore_filename: '${{ secrets.KEYSTORE_FILENAME }}'
       keystore_encrypt_key: '${{ secrets.KEYSTORE_ENCRYPT_KEY }}'
+      test_dummy: '${{ secrets.TEST_DUMMY }}'
       
     steps:
       - uses: actions/checkout@v3
@@ -83,27 +84,19 @@ jobs:
         
       - name: Prepare commit hash
         run: |
-          echo $(echo $CIRCLE_SHA1 | cut -c1-5)
+          echo $GITHUB_SHA  
           echo "" >> "./gradle.properties"
-          echo "commit_hash=$(echo $CIRCLE_SHA1 | cut -c1-5)" >> "./gradle.properties"      
+          echo "commit_hash=${GITHUB_SHA}" >> "./gradle.properties"         
+          cat ./gradle.properties
           
       - name: Prepare keystore properties for Signing
         run: |
           echo "" >> "./keystore.properties"
-          echo "deviceForTestersRelease.storePath=../${keystore_filename}" >> "./keystore.properties"
-          echo "deviceForTestersRelease.storePassword=${keystore_password}" >> "./keystore.properties"
-          echo "deviceForTestersRelease.keyAlias=${key_alias}" >> "./keystore.properties"
-          echo "deviceForTestersRelease.keyPassword=${key_password}" >> "./keystore.properties"          
-          
-      - name: Quick Build
-        run: ./gradlew -PdisablePreDex :Corona-Warn-App:assembleDeviceForTestersRelease
-
-      - name: Archive apk
-        uses: actions/upload-artifact@v3
-        with:
-          name: apk
-          path: Corona-Warn-App/build/outputs/apk
-      
+          echo "deviceForTestersRelease.storePath=../${test_dummy}" >> "./keystore.properties"
+          echo "deviceForTestersRelease.storePassword=${test_dummy}" >> "./keystore.properties"
+          echo "deviceForTestersRelease.keyAlias=${test_dummy}" >> "./keystore.properties"
+          echo "deviceForTestersRelease.keyPassword=${test_dummy}" >> "./keystore.properties" 
+          cat ./keystore.properties 
         
   firebase_screenshots:
     runs-on: ubuntu-latest
