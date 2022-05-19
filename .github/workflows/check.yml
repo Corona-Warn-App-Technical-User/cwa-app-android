@@ -1,9 +1,7 @@
 name: Check
 
 on:
-  push:
-    branches:
-    - feature/13058-GitHub-Actions    
+  push  
     
 env:
   total-test-runners: 4
