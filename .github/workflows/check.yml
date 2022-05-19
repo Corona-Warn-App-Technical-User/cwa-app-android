@@ -2,7 +2,11 @@ name: Check
 
 on:
   push  
-    
+
+concurrency: 
+  group: ${{ github.head_ref || github.ref }} #Cancel old runs if they have not finished yet
+  cancel-in-progress: true
+
 env:
   total-test-runners: 4
   JVM_OPTS: -Xmx4096m
