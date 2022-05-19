@@ -409,6 +409,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: unit_tests_device_release
     steps:
+      - name: Generate JaCoCo report
+        run: ./gradlew -PdisablePreDex :Corona-Warn-App:jacocoTestReportDeviceRelease -i
+        
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v1.6
         env:
